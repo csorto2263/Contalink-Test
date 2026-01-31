@@ -62,6 +62,14 @@ export class InvoicesPage {
     await this.limpiarButton.click();
   }
 
+  async logout(): Promise<void> {
+    const dialogPromise = this.page.waitForEvent('dialog').then(async (dialog) => {
+      await dialog.accept();
+    });
+    await this.cerrarSesionButton.click();
+    await Promise.race([dialogPromise, this.page.waitForTimeout(1000)]);
+  }
+
   async setInvoiceNumber(value: string): Promise<void> {
     await this.invoiceNumberInput.fill(value);
   }
