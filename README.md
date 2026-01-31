@@ -107,3 +107,4 @@ All secrets/config live in `.env` (never hardcoded):
 
 ## ✅ Notes
 If the UI locators change, update the POM classes inside `src/pages/` only (tests stay stable).
+API tests are skipped automatically when `API_AUTH` is not configured.
