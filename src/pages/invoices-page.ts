@@ -36,8 +36,8 @@ export class InvoicesPage {
   async expectLoaded(): Promise<void> {
     const pageTitle = this.page.getByRole('heading', { name: 'Sistema de Facturas' });
     const sectionTitle = this.page
-      .getByRole('heading', { name: 'Facturas' })
-      .or(this.page.getByText('Facturas', { exact: true }));
+      .getByRole('heading', { name: 'Facturas', exact: true })
+      .or(this.page.getByRole('link', { name: 'Facturas', exact: true }));
     const filtersTitle = this.page.getByText('Filtros de Búsqueda', { exact: true });
 
     await expect(pageTitle).toBeVisible();
