@@ -11,8 +11,8 @@ export class AccessCodePage {
   async enterAccessCode(code: string): Promise<void> {
     const input = this.page
       .locator('#access-code')
-      .or(this.page.getByRole('textbox', { name: /access code/i }))
-      .or(this.page.getByPlaceholder(/access code/i));
+      .or(this.page.getByRole('textbox', { name: /access code|c[oó]digo de acceso/i }))
+      .or(this.page.getByPlaceholder(/access code|c[oó]digo de acceso/i));
     await expect(input).toBeVisible();
     await input.fill(code);
   }
