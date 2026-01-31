@@ -16,9 +16,9 @@ export class DashboardPage {
   }
 
   async expectLoggedInIndicator(): Promise<void> {
-    const indicator = this.page.getByRole('button', { name: /logout|sign out/i }).or(
-      this.page.getByText(/logout|sign out/i)
-    );
+    const indicator = this.page
+      .getByRole('button', { name: /logout|sign out|cerrar sesión/i })
+      .or(this.page.getByText(/logout|sign out|cerrar sesión/i));
     await expect(indicator).toBeVisible();
   }
 }
