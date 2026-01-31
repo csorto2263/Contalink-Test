@@ -1,7 +1,7 @@
 import { test as base } from '@playwright/test';
 import { AccessCodePage } from '../pages/access-code-page';
 import { DashboardPage } from '../pages/dashboard-page';
-import { requireEnv } from '../utils/env';
+import { env } from '../utils/env';
 
 type UiFixtures = {
   accessCodePage: AccessCodePage;
@@ -20,6 +20,10 @@ export const test = base.extend<UiFixtures>({
 export const expect = test.expect;
 
 export const login = async (accessCodePage: AccessCodePage): Promise<void> => {
-  const accessCode = requireEnv('webAccessCode');
+  if (!env.webAccessCode) {
+    test.skip(true, 'WEB_ACCESS_CODE is not configured for access code login.');
+    return;
+  }
+  const accessCode = env.webAccessCode;
   await accessCodePage.login(accessCode);
 };
