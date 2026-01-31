@@ -38,7 +38,8 @@ export class InvoicesPage {
     const sectionTitle = this.page
       .getByRole('heading', { name: /Facturas/i })
       .or(this.page.getByRole('link', { name: /Facturas/i }))
-      .or(this.page.getByText('Facturas', { exact: true }));
+      .or(this.page.getByText('Facturas', { exact: true }))
+      .or(this.page.locator('p.text-2xl', { hasText: /Facturas/i }));
     const filtersTitle = this.page.getByText('Filtros de Búsqueda', { exact: true });
 
     await expect(pageTitle).toBeVisible();
