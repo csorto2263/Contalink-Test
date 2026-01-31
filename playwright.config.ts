@@ -19,7 +19,6 @@ export default defineConfig({
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    viewport: null,
     launchOptions: {
       args: ['--start-maximized']
     }
@@ -29,7 +28,6 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        viewport: null,
         launchOptions: {
           args: ['--start-maximized']
         }
