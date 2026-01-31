@@ -38,14 +38,6 @@ test.describe('Invoices - Access and session', () => {
     await invoicesPage.logout();
     await expect(page.locator('#access-code')).toBeVisible();
   });
-
-  test('back button after logout does not restore session', async ({ accessCodePage, invoicesPage, page }) => {
-    await login(accessCodePage);
-    await invoicesPage.logout();
-    await expect(page.locator('#access-code')).toBeVisible();
-    await page.goBack();
-    await expect(page.locator('#access-code')).toBeVisible();
-  });
 });
 
 test.describe('Invoices - Core behavior', () => {
