@@ -1,8 +1,10 @@
 import { test, expect } from '@playwright/test';
 import { ApiClient, buildInvoicePayload } from '../../src/utils/api-client';
+import { env } from '../../src/utils/env';
 
 
 test.describe('Invoices API', () => {
+  test.skip(!env.apiAuth, 'API_AUTH is not configured. Copy .env.example to .env and set API_AUTH.');
   let apiClient: ApiClient;
   let invoiceId: string | undefined;
 
