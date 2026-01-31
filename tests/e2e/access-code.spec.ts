@@ -12,7 +12,7 @@ test.describe('Access code login', () => {
     await accessCodePage.enterAccessCode('INVALID_CODE');
     await accessCodePage.submitAccessCode();
 
-    const errorMessage = page.getByText(/invalid|error|access code/i);
+    const errorMessage = page.getByText(/invalid|error|access code|no es v[aá]lido|c[oó]digo de acceso/i);
     await expect(errorMessage).toBeVisible();
   });
 });
