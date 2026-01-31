@@ -9,18 +9,13 @@ export class AccessCodePage {
   }
 
   async enterAccessCode(code: string): Promise<void> {
-    const input = this.page
-      .locator('#access-code')
-      .or(this.page.getByRole('textbox', { name: /access code|c[oó]digo de acceso/i }))
-      .or(this.page.getByPlaceholder(/access code|c[oó]digo de acceso/i));
+    const input = this.page.locator('#access-code');
     await expect(input).toBeVisible();
     await input.fill(code);
   }
 
   async submitAccessCode(): Promise<void> {
-    const button = this.page
-      .getByRole('button', { name: /validar c[oó]digo/i })
-      .or(this.page.getByRole('button', { name: /continue|enter|submit|access/i }));
+    const button = this.page.getByRole('button', { name: 'Validar Código' });
     await expect(button).toBeVisible();
     await button.click();
   }

@@ -1,11 +1,13 @@
 import { test as base } from '@playwright/test';
 import { AccessCodePage } from '../pages/access-code-page';
 import { DashboardPage } from '../pages/dashboard-page';
+import { InvoicesPage } from '../pages/invoices-page';
 import { env } from '../utils/env';
 
 type UiFixtures = {
   accessCodePage: AccessCodePage;
   dashboardPage: DashboardPage;
+  invoicesPage: InvoicesPage;
 };
 
 export const test = base.extend<UiFixtures>({
@@ -14,6 +16,9 @@ export const test = base.extend<UiFixtures>({
   },
   dashboardPage: async ({ page }, use) => {
     await use(new DashboardPage(page));
+  },
+  invoicesPage: async ({ page }, use) => {
+    await use(new InvoicesPage(page));
   }
 });
 
