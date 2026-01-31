@@ -35,13 +35,13 @@ test.describe('Invoices - Access and session', () => {
 
   test('logout works', async ({ accessCodePage, invoicesPage, page }) => {
     await login(accessCodePage);
-    await invoicesPage.cerrarSesionButton.click();
+    await invoicesPage.logout();
     await expect(page.locator('#access-code')).toBeVisible();
   });
 
   test('back button after logout does not restore session', async ({ accessCodePage, invoicesPage, page }) => {
     await login(accessCodePage);
-    await invoicesPage.cerrarSesionButton.click();
+    await invoicesPage.logout();
     await expect(page.locator('#access-code')).toBeVisible();
     await page.goBack();
     await expect(page.locator('#access-code')).toBeVisible();
