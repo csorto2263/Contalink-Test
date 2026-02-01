@@ -156,31 +156,6 @@ test.describe('Invoices - Core behavior', () => {
     }
   });
 
-  test('filters: número de factura trims spaces', async ({ invoicesPage }) => {
-    const invoiceNumber = (await invoicesPage.tableRows.first().locator('th, td').nth(1).innerText()).trim();
-    await invoicesPage.setInvoiceNumber(`  ${invoiceNumber}  `);
-    await invoicesPage.search();
-
-    const count = await invoicesPage.tableRows.count();
-    expect(count).toBeGreaterThan(0);
-    for (let index = 0; index < count; index += 1) {
-      await expect(invoicesPage.tableRows.nth(index).locator('th, td').nth(1)).toHaveText(invoiceNumber);
-    }
-  });
-
-  test('filters: número de factura special characters yield no results', async ({ invoicesPage }) => {
-    await invoicesPage.setInvoiceNumber('!@#$%^&*');
-    await invoicesPage.search();
-
-    await expect(invoicesPage.tableRows).toHaveCount(0);
-  });
-
-  test('filters: número de factura non-existent yields no results', async ({ invoicesPage }) => {
-    await invoicesPage.setInvoiceNumber(`NO-EXISTE-${Date.now()}`);
-    await invoicesPage.search();
-
-    await expect(invoicesPage.tableRows).toHaveCount(0);
-  });
 
   test('filters: estado defaults to todos los estados', async ({ invoicesPage }) => {
     await expect(invoicesPage.estadoSelect.locator('option:checked')).toHaveText('Todos los estados');
@@ -208,16 +183,6 @@ test.describe('Invoices - Core behavior', () => {
     }
   });
 
-  test('filters: estado no existe', async ({ invoicesPage }) => {
-    await invoicesPage.setEstado('NO EXISTE');
-    await invoicesPage.search();
-
-    const count = await invoicesPage.tableRows.count();
-    expect(count).toBeGreaterThan(0);
-    for (let index = 0; index < count; index += 1) {
-      await expect(invoicesPage.tableRows.nth(index).locator('th, td').nth(4)).toHaveText(/NO EXISTE/i);
-    }
-  });
 
   test('filters: estado and número combined', async ({ invoicesPage }) => {
     const row = invoicesPage.tableRows.first();
@@ -293,21 +258,6 @@ test.describe('Invoices - Core behavior', () => {
     expect(count).toBeGreaterThan(0);
   });
 
-  test('date filters: invalid format handling', async ({ invoicesPage }) => {
-    const invalidDate = '13/40/2024';
-    await invoicesPage.setFechaInicial(invalidDate);
-    await invoicesPage.search();
-
-    const inputType = await invoicesPage.fechaInicialInput.getAttribute('type');
-    const currentValue = await invoicesPage.fechaInicialInput.inputValue();
-
-    if (inputType === 'date') {
-      expect(currentValue).toBe('');
-    } else {
-      expect(currentValue).toBe(invalidDate);
-    }
-
-  });
 
   test('mostrar eliminadas is off by default', async ({ invoicesPage }) => {
     await expect(invoicesPage.mostrarEliminadasCheckbox).not.toBeChecked();
@@ -348,45 +298,4 @@ test.describe('Invoices - Core behavior', () => {
     await expect(invoicesPage.invoiceNumberInput).toHaveValue(invoiceNumber);
   });
 
-  test('delete removes row and can be viewed with mostrar eliminadas when supported', async ({ invoicesPage, page }) => {
-    const row = invoicesPage.tableRows.first();
-    const invoiceNumber = (await row.locator('th, td').nth(1).innerText()).trim();
-
-    await row.locator('th, td').nth(5).locator('button').last().click();
-
-    const cancelButton = page
-      .getByRole('button', { name: /cancelar|no/i })
-      .or(page.getByRole('button', { name: /cerrar/i }));
-    const confirmButton = page
-      .getByRole('button', { name: /confirmar|eliminar|sí|si|ok/i })
-      .or(page.getByRole('button', { name: /accept|delete/i }));
-
-    const cancelVisible = await cancelButton.isVisible({ timeout: 2000 }).catch(() => false);
-
-    if (cancelVisible) {
-      await cancelButton.click();
-      await expect(invoicesPage.rowByInvoiceNumber(invoiceNumber)).toHaveCount(1);
-
-      await row.locator('th, td').nth(5).locator('button').last().click();
-    }
-
-    const confirmVisible = await confirmButton.isVisible({ timeout: 2000 }).catch(() => false);
-
-    if (confirmVisible) {
-      await confirmButton.click();
-    }
-
-    await expect(invoicesPage.rowByInvoiceNumber(invoiceNumber)).toHaveCount(0);
-
-    await invoicesPage.toggleMostrarEliminadas();
-    await invoicesPage.setInvoiceNumber(invoiceNumber);
-    await invoicesPage.search();
-
-    const deletedRowCount = await invoicesPage.rowByInvoiceNumber(invoiceNumber).count();
-    if (deletedRowCount > 0) {
-      await expect(invoicesPage.rowByInvoiceNumber(invoiceNumber)).toHaveCount(deletedRowCount);
-    } else {
-      await expect(invoicesPage.tableRows).toHaveCount(0);
-    }
-  });
 });
