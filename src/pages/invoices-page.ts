@@ -81,11 +81,13 @@ export class InvoicesPage {
   }
 
   async setFechaInicial(value: string): Promise<void> {
-    await this.fechaInicialInput.fill(value);
+    const formattedValue = await this.normalizeDateForInput(this.fechaInicialInput, value);
+    await this.fechaInicialInput.fill(formattedValue);
   }
 
   async setFechaFinal(value: string): Promise<void> {
-    await this.fechaFinalInput.fill(value);
+    const formattedValue = await this.normalizeDateForInput(this.fechaFinalInput, value);
+    await this.fechaFinalInput.fill(formattedValue);
   }
 
   async toggleMostrarEliminadas(): Promise<void> {
@@ -98,5 +100,24 @@ export class InvoicesPage {
 
   rowByInvoiceNumber(invoiceNumber: string): Locator {
     return this.tableRows.filter({ has: this.page.getByText(invoiceNumber, { exact: true }) });
+  }
+
+  private async normalizeDateForInput(input: Locator, value: string): Promise<string> {
+    if (!value) {
+      return value;
+    }
+    const inputType = await input.getAttribute('type');
+    if (inputType !== 'date') {
+      return value;
+    }
+
+    const slashMatch = value.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+    if (!slashMatch) {
+      return value;
+    }
+
+    const [, month, day, yearValue] = slashMatch;
+    const year = yearValue.length === 2 ? `20${yearValue}` : yearValue;
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
   }
 }
