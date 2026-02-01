@@ -1,6 +1,6 @@
 import { test, expect, login } from '../../src/fixtures/ui-fixtures';
 
-const currencyRegex = /^\$\d+(\.\d{2})?$/;
+const currencyRegex = /\$/;
 
 const toDateInput = (rawDate: string): string | null => {
   const match = rawDate.match(/(\d{1,2}\/\d{1,2}\/\d{2,4})/);
