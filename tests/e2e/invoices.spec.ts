@@ -75,11 +75,18 @@ test.describe('Invoices - Core behavior', () => {
     const initialCount = await invoicesPage.tableRows.count();
     const firstRow = invoicesPage.tableRows.first();
     const invoiceNumber = (await firstRow.locator('th, td').nth(1).innerText()).trim();
+    console.log('buscar triggers results update:', {
+      initialCount,
+      invoiceNumber,
+    });
 
     await invoicesPage.setInvoiceNumber(invoiceNumber);
     await invoicesPage.search();
 
     const filteredCount = await invoicesPage.tableRows.count();
+    console.log('buscar triggers results update:', {
+      filteredCount,
+    });
     expect(filteredCount).toBeGreaterThan(0);
     expect(filteredCount).toBeLessThanOrEqual(initialCount);
 
