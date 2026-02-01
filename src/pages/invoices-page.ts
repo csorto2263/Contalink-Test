@@ -61,6 +61,7 @@ export class InvoicesPage {
 
   async clearFilters(): Promise<void> {
     await this.limpiarButton.click();
+    await this.page.waitForTimeout(3000);
   }
 
   async logout(): Promise<void> {
