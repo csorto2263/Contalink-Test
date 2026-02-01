@@ -58,11 +58,11 @@ test.describe('Invoices - Core behavior', () => {
     expect(rowsCount).toBeGreaterThan(0);
 
     const row = invoicesPage.tableRows.first();
-    const id = row.locator('td').nth(0);
-    const number = row.locator('td').nth(1);
-    const total = row.locator('td').nth(2);
-    const estado = row.locator('td').nth(4);
-    const acciones = row.locator('td').nth(5);
+    const id = row.locator('th, td').nth(0);
+    const number = row.locator('th, td').nth(1);
+    const total = row.locator('th, td').nth(2);
+    const estado = row.locator('th, td').nth(4);
+    const acciones = row.locator('th, td').nth(5);
 
     await expect(id).toHaveText(/.+/);
     await expect(number).toHaveText(/.+/);
@@ -74,7 +74,7 @@ test.describe('Invoices - Core behavior', () => {
   test('buscar triggers results update', async ({ invoicesPage }) => {
     const initialCount = await invoicesPage.tableRows.count();
     const firstRow = invoicesPage.tableRows.first();
-    const invoiceNumber = (await firstRow.locator('td').nth(1).innerText()).trim();
+    const invoiceNumber = (await firstRow.locator('th, td').nth(1).innerText()).trim();
 
     await invoicesPage.setInvoiceNumber(invoiceNumber);
     await invoicesPage.search();
@@ -84,7 +84,7 @@ test.describe('Invoices - Core behavior', () => {
     expect(filteredCount).toBeLessThanOrEqual(initialCount);
 
     for (let index = 0; index < filteredCount; index += 1) {
-      await expect(invoicesPage.tableRows.nth(index).locator('td').nth(1)).toHaveText(invoiceNumber);
+      await expect(invoicesPage.tableRows.nth(index).locator('th, td').nth(1)).toHaveText(invoiceNumber);
     }
   });
 
@@ -105,19 +105,19 @@ test.describe('Invoices - Core behavior', () => {
   });
 
   test('filters: número de factura exact match', async ({ invoicesPage }) => {
-    const invoiceNumber = (await invoicesPage.tableRows.first().locator('td').nth(1).innerText()).trim();
+    const invoiceNumber = (await invoicesPage.tableRows.first().locator('th, td').nth(1).innerText()).trim();
     await invoicesPage.setInvoiceNumber(invoiceNumber);
     await invoicesPage.search();
 
     const count = await invoicesPage.tableRows.count();
     expect(count).toBeGreaterThan(0);
     for (let index = 0; index < count; index += 1) {
-      await expect(invoicesPage.tableRows.nth(index).locator('td').nth(1)).toHaveText(invoiceNumber);
+      await expect(invoicesPage.tableRows.nth(index).locator('th, td').nth(1)).toHaveText(invoiceNumber);
     }
   });
 
   test('filters: número de factura partial match', async ({ invoicesPage }) => {
-    const invoiceNumber = (await invoicesPage.tableRows.first().locator('td').nth(1).innerText()).trim();
+    const invoiceNumber = (await invoicesPage.tableRows.first().locator('th, td').nth(1).innerText()).trim();
     const partial = invoiceNumber.slice(0, Math.max(3, Math.floor(invoiceNumber.length / 2)));
 
     await invoicesPage.setInvoiceNumber(partial);
@@ -126,12 +126,12 @@ test.describe('Invoices - Core behavior', () => {
     const count = await invoicesPage.tableRows.count();
     expect(count).toBeGreaterThan(0);
     for (let index = 0; index < count; index += 1) {
-      await expect(invoicesPage.tableRows.nth(index).locator('td').nth(1)).toContainText(partial);
+      await expect(invoicesPage.tableRows.nth(index).locator('th, td').nth(1)).toContainText(partial);
     }
   });
 
   test('filters: número de factura case variations when applicable', async ({ invoicesPage }) => {
-    const invoiceNumber = (await invoicesPage.tableRows.first().locator('td').nth(1).innerText()).trim();
+    const invoiceNumber = (await invoicesPage.tableRows.first().locator('th, td').nth(1).innerText()).trim();
     const hasLetters = /[a-z]/i.test(invoiceNumber);
     test.skip(!hasLetters, 'Invoice number has no alphabetic characters for case-variation check.');
 
@@ -144,20 +144,20 @@ test.describe('Invoices - Core behavior', () => {
     const count = await invoicesPage.tableRows.count();
     expect(count).toBeGreaterThan(0);
     for (let index = 0; index < count; index += 1) {
-      const value = await invoicesPage.tableRows.nth(index).locator('td').nth(1).innerText();
+      const value = await invoicesPage.tableRows.nth(index).locator('th, td').nth(1).innerText();
       expect(value.toLowerCase()).toContain(invoiceNumber.toLowerCase());
     }
   });
 
   test('filters: número de factura trims spaces', async ({ invoicesPage }) => {
-    const invoiceNumber = (await invoicesPage.tableRows.first().locator('td').nth(1).innerText()).trim();
+    const invoiceNumber = (await invoicesPage.tableRows.first().locator('th, td').nth(1).innerText()).trim();
     await invoicesPage.setInvoiceNumber(`  ${invoiceNumber}  `);
     await invoicesPage.search();
 
     const count = await invoicesPage.tableRows.count();
     expect(count).toBeGreaterThan(0);
     for (let index = 0; index < count; index += 1) {
-      await expect(invoicesPage.tableRows.nth(index).locator('td').nth(1)).toHaveText(invoiceNumber);
+      await expect(invoicesPage.tableRows.nth(index).locator('th, td').nth(1)).toHaveText(invoiceNumber);
     }
   });
 
@@ -186,7 +186,7 @@ test.describe('Invoices - Core behavior', () => {
     const count = await invoicesPage.tableRows.count();
     expect(count).toBeGreaterThan(0);
     for (let index = 0; index < count; index += 1) {
-      await expect(invoicesPage.tableRows.nth(index).locator('td').nth(4)).toHaveText(/Vigente/i);
+      await expect(invoicesPage.tableRows.nth(index).locator('th, td').nth(4)).toHaveText(/Vigente/i);
     }
   });
 
@@ -197,7 +197,7 @@ test.describe('Invoices - Core behavior', () => {
     const count = await invoicesPage.tableRows.count();
     expect(count).toBeGreaterThan(0);
     for (let index = 0; index < count; index += 1) {
-      await expect(invoicesPage.tableRows.nth(index).locator('td').nth(4)).toHaveText(/Pagado/i);
+      await expect(invoicesPage.tableRows.nth(index).locator('th, td').nth(4)).toHaveText(/Pagado/i);
     }
   });
 
@@ -208,14 +208,14 @@ test.describe('Invoices - Core behavior', () => {
     const count = await invoicesPage.tableRows.count();
     expect(count).toBeGreaterThan(0);
     for (let index = 0; index < count; index += 1) {
-      await expect(invoicesPage.tableRows.nth(index).locator('td').nth(4)).toHaveText(/NO EXISTE/i);
+      await expect(invoicesPage.tableRows.nth(index).locator('th, td').nth(4)).toHaveText(/NO EXISTE/i);
     }
   });
 
   test('filters: estado and número combined', async ({ invoicesPage }) => {
     const row = invoicesPage.tableRows.first();
-    const invoiceNumber = (await row.locator('td').nth(1).innerText()).trim();
-    const estado = (await row.locator('td').nth(4).innerText()).trim();
+    const invoiceNumber = (await row.locator('th, td').nth(1).innerText()).trim();
+    const estado = (await row.locator('th, td').nth(4).innerText()).trim();
 
     await invoicesPage.setInvoiceNumber(invoiceNumber);
     await invoicesPage.setEstado(estado);
@@ -224,13 +224,13 @@ test.describe('Invoices - Core behavior', () => {
     const count = await invoicesPage.tableRows.count();
     expect(count).toBeGreaterThan(0);
     for (let index = 0; index < count; index += 1) {
-      await expect(invoicesPage.tableRows.nth(index).locator('td').nth(1)).toHaveText(invoiceNumber);
-      await expect(invoicesPage.tableRows.nth(index).locator('td').nth(4)).toHaveText(new RegExp(estado, 'i'));
+      await expect(invoicesPage.tableRows.nth(index).locator('th, td').nth(1)).toHaveText(invoiceNumber);
+      await expect(invoicesPage.tableRows.nth(index).locator('th, td').nth(4)).toHaveText(new RegExp(estado, 'i'));
     }
   });
 
   test('date filters: valid range search', async ({ invoicesPage }) => {
-    const dateCell = await invoicesPage.tableRows.first().locator('td').nth(3).innerText();
+    const dateCell = await invoicesPage.tableRows.first().locator('th, td').nth(3).innerText();
     const inputDate = toDateInput(dateCell);
     test.skip(!inputDate, 'Unable to parse date from the first row for date-range validation.');
 
@@ -243,7 +243,7 @@ test.describe('Invoices - Core behavior', () => {
   });
 
   test('date filters: start date after end date handling', async ({ invoicesPage, page }) => {
-    const dateCell = await invoicesPage.tableRows.first().locator('td').nth(3).innerText();
+    const dateCell = await invoicesPage.tableRows.first().locator('th, td').nth(3).innerText();
     const inputDate = toDateInput(dateCell);
     test.skip(!inputDate, 'Unable to parse date from the first row for date validation.');
 
@@ -261,7 +261,7 @@ test.describe('Invoices - Core behavior', () => {
   });
 
   test('date filters: only start date', async ({ invoicesPage }) => {
-    const dateCell = await invoicesPage.tableRows.first().locator('td').nth(3).innerText();
+    const dateCell = await invoicesPage.tableRows.first().locator('th, td').nth(3).innerText();
     const inputDate = toDateInput(dateCell);
     test.skip(!inputDate, 'Unable to parse date from the first row for start-date validation.');
 
@@ -274,7 +274,7 @@ test.describe('Invoices - Core behavior', () => {
   });
 
   test('date filters: only end date', async ({ invoicesPage }) => {
-    const dateCell = await invoicesPage.tableRows.first().locator('td').nth(3).innerText();
+    const dateCell = await invoicesPage.tableRows.first().locator('th, td').nth(3).innerText();
     const inputDate = toDateInput(dateCell);
     test.skip(!inputDate, 'Unable to parse date from the first row for end-date validation.');
 
@@ -314,12 +314,12 @@ test.describe('Invoices - Core behavior', () => {
     const count = await invoicesPage.tableRows.count();
     expect(count).toBeGreaterThan(0);
     for (let index = 0; index < count; index += 1) {
-      await expect(invoicesPage.tableRows.nth(index).locator('td').nth(4)).toHaveText(/Vigente/i);
+      await expect(invoicesPage.tableRows.nth(index).locator('th, td').nth(4)).toHaveText(/Vigente/i);
     }
   });
 
   test('mostrar eliminadas combined with número', async ({ invoicesPage }) => {
-    const invoiceNumber = (await invoicesPage.tableRows.first().locator('td').nth(1).innerText()).trim();
+    const invoiceNumber = (await invoicesPage.tableRows.first().locator('th, td').nth(1).innerText()).trim();
     await invoicesPage.toggleMostrarEliminadas();
     await invoicesPage.setInvoiceNumber(invoiceNumber);
     await invoicesPage.search();
@@ -327,12 +327,12 @@ test.describe('Invoices - Core behavior', () => {
     const count = await invoicesPage.tableRows.count();
     expect(count).toBeGreaterThan(0);
     for (let index = 0; index < count; index += 1) {
-      await expect(invoicesPage.tableRows.nth(index).locator('td').nth(1)).toHaveText(invoiceNumber);
+      await expect(invoicesPage.tableRows.nth(index).locator('th, td').nth(1)).toHaveText(invoiceNumber);
     }
   });
 
   test('mostrar eliminadas toggle preserves filters', async ({ invoicesPage }) => {
-    const invoiceNumber = (await invoicesPage.tableRows.first().locator('td').nth(1).innerText()).trim();
+    const invoiceNumber = (await invoicesPage.tableRows.first().locator('th, td').nth(1).innerText()).trim();
     await invoicesPage.setInvoiceNumber(invoiceNumber);
     await invoicesPage.search();
 
@@ -343,9 +343,9 @@ test.describe('Invoices - Core behavior', () => {
 
   test('delete removes row and can be viewed with mostrar eliminadas when supported', async ({ invoicesPage, page }) => {
     const row = invoicesPage.tableRows.first();
-    const invoiceNumber = (await row.locator('td').nth(1).innerText()).trim();
+    const invoiceNumber = (await row.locator('th, td').nth(1).innerText()).trim();
 
-    await row.locator('td').nth(5).locator('button').last().click();
+    await row.locator('th, td').nth(5).locator('button').last().click();
 
     const cancelButton = page
       .getByRole('button', { name: /cancelar|no/i })
@@ -360,7 +360,7 @@ test.describe('Invoices - Core behavior', () => {
       await cancelButton.click();
       await expect(invoicesPage.rowByInvoiceNumber(invoiceNumber)).toHaveCount(1);
 
-      await row.locator('td').nth(5).locator('button').last().click();
+      await row.locator('th, td').nth(5).locator('button').last().click();
     }
 
     const confirmVisible = await confirmButton.isVisible({ timeout: 2000 }).catch(() => false);
