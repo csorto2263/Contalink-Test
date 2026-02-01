@@ -6,7 +6,6 @@
   "scripts": {
     "test": "playwright test",
     "test:ui": "playwright test tests/e2e",
-    "test:api": "playwright test tests/api",
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug",
     "lint": "tsc --noEmit"

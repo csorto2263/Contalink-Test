@@ -4,9 +4,7 @@ dotenv.config();
 
 export const env = {
   webBaseUrl: process.env.WEB_BASE_URL || 'https://candidates-qa.contalink.com/',
-  webAccessCode: process.env.WEB_ACCESS_CODE || '',
-  apiBaseUrl: process.env.API_BASE_URL || 'https://candidates-api.contalink.com/',
-  apiAuth: process.env.API_AUTH || ''
+  webAccessCode: process.env.WEB_ACCESS_CODE || ''
 };
 
 export const requireEnv = (key: keyof typeof env): string => {
