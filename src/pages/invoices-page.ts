@@ -56,6 +56,7 @@ export class InvoicesPage {
 
   async search(): Promise<void> {
     await this.buscarButton.click();
+    await this.page.waitForTimeout(3000);
   }
 
   async clearFilters(): Promise<void> {
