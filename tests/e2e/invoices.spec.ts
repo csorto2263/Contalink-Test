@@ -1,7 +1,9 @@
 import { test, expect, login } from '../../src/fixtures/ui-fixtures';
 
+// Expresión regular para detectar valores en moneda.
 const currencyRegex = /\$/;
 
+// Convierte una fecha en texto a formato mm/dd/yyyy si es posible.
 const toDateInput = (rawDate: string): string | null => {
   const match = rawDate.match(/(\d{1,2}\/\d{1,2}\/\d{2,4})/);
   if (!match) {
@@ -12,6 +14,7 @@ const toDateInput = (rawDate: string): string | null => {
   return `${month.padStart(2, '0')}/${day.padStart(2, '0')}/${year}`;
 };
 
+// Suma una cantidad de días a una fecha en formato mm/dd/yyyy.
 const addDays = (value: string, days: number): string => {
   const [month, day, year] = value.split('/').map(Number);
   const date = new Date(year, month - 1, day);
@@ -21,18 +24,22 @@ const addDays = (value: string, days: number): string => {
   return `${mm}/${dd}/${date.getFullYear()}`;
 };
 
+// Suite de pruebas relacionadas con acceso y sesión de facturas.
 test.describe('Invoices - Access and session', () => {
+  // Comprueba que el login redirige a la pantalla de facturas.
   test('access code login works and lands in invoices screen', async ({ accessCodePage, invoicesPage }) => {
     await login(accessCodePage);
     await invoicesPage.expectLoaded();
   });
 
+  // Verifica que el acceso directo sin sesión sea bloqueado.
   test('direct navigation without session is blocked', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('#access-code')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Validar Código' })).toBeVisible();
   });
 
+  // Valida que el flujo de logout devuelva al acceso con código.
   test('logout works', async ({ accessCodePage, invoicesPage, page }) => {
     await login(accessCodePage);
     await invoicesPage.logout();
@@ -40,19 +47,24 @@ test.describe('Invoices - Access and session', () => {
   });
 });
 
+// Suite de pruebas para comportamiento principal de la pantalla de facturas.
 test.describe('Invoices - Core behavior', () => {
+  // Ejecuta la suite de forma serial para evitar interferencia entre casos.
   test.describe.configure({ mode: 'serial' });
 
+  // Realiza login antes de cada caso para asegurar contexto válido.
   test.beforeEach(async ({ accessCodePage, invoicesPage }) => {
     await login(accessCodePage);
     await invoicesPage.expectLoaded();
   });
 
+  // Asegura que los elementos principales estén visibles al cargar.
   test('initial load shows titles, filters, buttons, and table columns', async ({ invoicesPage }) => {
     await invoicesPage.expectLoaded();
     await invoicesPage.expectTableColumns();
   });
 
+  // Verifica que cada fila tenga datos esenciales en las columnas.
   test('table listing shows required data per row', async ({ invoicesPage }) => {
     const rowsCount = await invoicesPage.tableRows.count();
     expect(rowsCount).toBeGreaterThan(0);
@@ -71,6 +83,7 @@ test.describe('Invoices - Core behavior', () => {
     await expect(acciones.locator('button').last()).toBeVisible();
   });
 
+  // Confirma que la búsqueda filtra resultados.
   test('buscar triggers results update', async ({ invoicesPage }) => {
     const initialCount = await invoicesPage.tableRows.count();
     const firstRow = invoicesPage.tableRows.first();
@@ -95,6 +108,7 @@ test.describe('Invoices - Core behavior', () => {
     }
   });
 
+  // Verifica que limpiar filtros restablezca valores por defecto.
   test('limpiar filtros resets inputs and defaults', async ({ invoicesPage }) => {
     await invoicesPage.setInvoiceNumber('FAC-001');
     await invoicesPage.setEstado('Vigente');
@@ -111,6 +125,7 @@ test.describe('Invoices - Core behavior', () => {
     await expect(invoicesPage.estadoSelect.locator('option:checked')).toHaveText('Todos los estados');
   });
 
+  // Comprueba filtro por número exacto de factura.
   test('filters: número de factura exact match', async ({ invoicesPage }) => {
     const invoiceNumber = (await invoicesPage.tableRows.first().locator('th, td').nth(1).innerText()).trim();
     await invoicesPage.setInvoiceNumber(invoiceNumber);
@@ -123,6 +138,7 @@ test.describe('Invoices - Core behavior', () => {
     }
   });
 
+  // Comprueba filtro parcial por número de factura.
   test('filters: número de factura partial match', async ({ invoicesPage }) => {
     const invoiceNumber = (await invoicesPage.tableRows.first().locator('th, td').nth(1).innerText()).trim();
     const partial = invoiceNumber.slice(0, Math.max(3, Math.floor(invoiceNumber.length / 2)));
@@ -140,6 +156,7 @@ test.describe('Invoices - Core behavior', () => {
     }
   });
 
+  // Valida que el filtro respete variaciones de mayúsculas/minúsculas.
   test('filters: número de factura case variations when applicable', async ({ invoicesPage }) => {
     const invoiceNumber = (await invoicesPage.tableRows.first().locator('th, td').nth(1).innerText()).trim();
     const hasLetters = /[a-z]/i.test(invoiceNumber);
@@ -159,11 +176,12 @@ test.describe('Invoices - Core behavior', () => {
     }
   });
 
-
+  // Verifica que el estado por defecto sea "Todos los estados".
   test('filters: estado defaults to todos los estados', async ({ invoicesPage }) => {
     await expect(invoicesPage.estadoSelect.locator('option:checked')).toHaveText('Todos los estados');
   });
 
+  // Comprueba filtro por estado "Vigente".
   test('filters: estado vigente', async ({ invoicesPage }) => {
     await invoicesPage.setEstado('Vigente');
     await invoicesPage.search();
@@ -175,6 +193,7 @@ test.describe('Invoices - Core behavior', () => {
     }
   });
 
+  // Comprueba filtro por estado "Pagado".
   test('filters: estado pagado', async ({ invoicesPage }) => {
     await invoicesPage.setEstado('Pagado');
     await invoicesPage.search();
@@ -186,7 +205,7 @@ test.describe('Invoices - Core behavior', () => {
     }
   });
 
-
+  // Valida filtros combinados de estado y número.
   test('filters: estado and número combined', async ({ invoicesPage }) => {
     const row = invoicesPage.tableRows.first();
     const invoiceNumber = (await row.locator('th, td').nth(1).innerText()).trim();
@@ -204,6 +223,7 @@ test.describe('Invoices - Core behavior', () => {
     }
   });
 
+  // Comprueba filtros por rango válido de fechas.
   test('date filters: valid range search', async ({ invoicesPage }) => {
     const dateCell = await invoicesPage.tableRows.first().locator('th, td').nth(3).innerText();
     const inputDate = toDateInput(dateCell);
@@ -217,6 +237,7 @@ test.describe('Invoices - Core behavior', () => {
     expect(count).toBeGreaterThan(0);
   });
 
+  // Valida el comportamiento cuando la fecha inicial es posterior a la final.
   test('date filters: start date after end date handling', async ({ invoicesPage, page }) => {
     const dateCell = await invoicesPage.tableRows.first().locator('th, td').nth(3).innerText();
     const inputDate = toDateInput(dateCell);
@@ -235,6 +256,7 @@ test.describe('Invoices - Core behavior', () => {
     }
   });
 
+  // Comprueba filtro con sólo fecha inicial.
   test('date filters: only start date', async ({ invoicesPage }) => {
     const dateCell = await invoicesPage.tableRows.first().locator('th, td').nth(3).innerText();
     const inputDate = toDateInput(dateCell);
@@ -248,6 +270,7 @@ test.describe('Invoices - Core behavior', () => {
     expect(count).toBeGreaterThan(0);
   });
 
+  // Comprueba filtro con sólo fecha final.
   test('date filters: only end date', async ({ invoicesPage }) => {
     const dateCell = await invoicesPage.tableRows.first().locator('th, td').nth(3).innerText();
     const inputDate = toDateInput(dateCell);
@@ -261,11 +284,12 @@ test.describe('Invoices - Core behavior', () => {
     expect(count).toBeGreaterThan(0);
   });
 
-
+  // Verifica que el checkbox de eliminadas esté desactivado por defecto.
   test('mostrar eliminadas is off by default', async ({ invoicesPage }) => {
     await expect(invoicesPage.mostrarEliminadasCheckbox).not.toBeChecked();
   });
 
+  // Comprueba combinación de "mostrar eliminadas" con estado.
   test('mostrar eliminadas combined with estado', async ({ invoicesPage }) => {
     await invoicesPage.toggleMostrarEliminadas();
     await invoicesPage.setEstado('Vigente');
@@ -278,6 +302,7 @@ test.describe('Invoices - Core behavior', () => {
     }
   });
 
+  // Comprueba combinación de "mostrar eliminadas" con número.
   test('mostrar eliminadas combined with número', async ({ invoicesPage }) => {
     const invoiceNumber = (await invoicesPage.tableRows.first().locator('th, td').nth(1).innerText()).trim();
     await invoicesPage.toggleMostrarEliminadas();
@@ -291,6 +316,7 @@ test.describe('Invoices - Core behavior', () => {
     }
   });
 
+  // Valida que el toggle de eliminadas no borre los filtros actuales.
   test('mostrar eliminadas toggle preserves filters', async ({ invoicesPage }) => {
     const invoiceNumber = (await invoicesPage.tableRows.first().locator('th, td').nth(1).innerText()).trim();
     await invoicesPage.setInvoiceNumber(invoiceNumber);
