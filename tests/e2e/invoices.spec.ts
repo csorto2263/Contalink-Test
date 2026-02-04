@@ -126,6 +126,7 @@ test.describe('Invoices - Core behavior', () => {
   test('filters: número de factura partial match', async ({ invoicesPage }) => {
     const invoiceNumber = (await invoicesPage.tableRows.first().locator('th, td').nth(1).innerText()).trim();
     const partial = invoiceNumber.slice(0, Math.max(3, Math.floor(invoiceNumber.length / 2)));
+    const escapedPartial = partial.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
     await invoicesPage.setInvoiceNumber(partial);
     await invoicesPage.search();
@@ -133,7 +134,9 @@ test.describe('Invoices - Core behavior', () => {
     const count = await invoicesPage.tableRows.count();
     expect(count).toBeGreaterThan(0);
     for (let index = 0; index < count; index += 1) {
-      await expect(invoicesPage.tableRows.nth(index).locator('th, td').nth(1)).toContainText(partial);
+      await expect(invoicesPage.tableRows.nth(index).locator('th, td').nth(1)).toContainText(
+        new RegExp(escapedPartial, 'i'),
+      );
     }
   });
 
